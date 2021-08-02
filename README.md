@@ -1,6 +1,8 @@
 # Pretrain_Bert_with_MaskLM
 使用Mask LM预训练任务来预训练Bert模型。
+
 训练关于垂直领域语料的模型表征，提升下游任务的表现。
+
 基于pytorch。
 
 
