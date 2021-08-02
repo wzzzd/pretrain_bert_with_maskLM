@@ -17,7 +17,7 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
     * 10%的概率，使用词表随机抽取的token，替换当前token。
     * 10%的概率，保留原词不变。
     <!-- * ![](./picture/mask_method.png) -->
-    * <img src=./picture/mask_method.png width=60% />
+    * <img src=./picture/mask_method.png width=50% />
 
 ## Model
 使用原生的Bert模型作为基准模型。
