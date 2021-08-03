@@ -3,7 +3,7 @@
 
 训练关于垂直领域语料的模型表征，提升下游任务的表现。
 
-基于pytorch。
+基于pytorch框架。
 
 
 ## Pretraining Task
@@ -23,7 +23,7 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 
 
 ## Model
-使用原生的Bert模型作为基准模型。
+使用原生的Bert模型作为基准模型。（原始的bert是使用MaskLM+NSP训练的，但是多篇论文证明了NSP对Bert的语义理解能力提升不大，此处去除该任务）
 <!-- * ![](./picture/bert_architecture.png) -->
 <div align="center">
  <img src=./picture/bert_architecture.png width=50% />
@@ -80,10 +80,11 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 ```
 
 ### 多卡模式
-如果你不幸运，拥有了多张GPU卡，那么恭喜你，你可以进入起飞模式。🚀🚀
+如果你不幸，拥有多张GPU卡，那么你可以进入起飞模式。🚀🚀
 
-（1）通过修改Config.py文件中的变量self.cuda_visible_devices，指定你需要在哪几张卡上运行，卡号之间以英文逗号隔开。
-（2）因为使用的是accelerate加速模块，故需要配置一些环境信息，在确保安装完环境所以的依赖包后，运行命令：
+（1）修改Config.py文件中的变量self.cuda_visible_devices，指定你需要在哪几张卡上运行，卡号之间以英文逗号隔开。
+
+（2）因为使用的是accelerate加速模块，需要配置一些环境信息，在确保安装完环境所以的依赖包后，运行命令：
 ```
     accelerate config
 ```
