@@ -15,13 +15,19 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
     * 10%的概率，使用词表随机抽取的token，替换当前token。
     * 10%的概率，保留原词不变。
 * paper
-    <!-- * ![](./picture/mask_method.png) -->
-    * <img src=./picture/mask_method.png width=50% />
+<!-- * ![](./picture/mask_method.png) -->
+
+<div align="center">
+ <img src=./picture/mask_method.png width=50% />
+</div>
+
 
 ## Model
 使用原生的Bert模型作为基准模型。
-* ![](./picture/bert_architecture.png)
-
+<!-- * ![](./picture/bert_architecture.png) -->
+<div align="center">
+ <img src=./picture/bert_architecture.png width=50% />
+</div>
 
 ## Datasets
 项目里的数据集来自wikitext，分成两个文件训练集（train.txt）和测试集（test.txt）。
@@ -92,7 +98,10 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
     * 回复1+回车：启动两个进程运行
 * Do you wish to use FP16 (mixed precision)? [yes/NO]:
     * 回复NO+回车：不使用FP16单精度加速
-* ![](./picture/accelerate_config.png)
+<!-- * ![](./picture/accelerate_config.png) -->
+<div align="center">
+ <img src=./picture/accelerate_config.png />
+</div>
 
 （4）运行程序启动命令
 ```
