@@ -1,9 +1,8 @@
 # Pretrain_Bert_with_MaskLM
-使用Mask LM预训练任务来预训练Bert模型。
+使用Mask LM训练任务来预训练Bert模型。
 
-训练关于垂直领域语料的模型表征，提升下游任务的表现。
+基于pytorch框架，训练关于垂直领域语料的模型表征，提升下游任务的表现。
 
-基于pytorch框架。
 
 
 ## Pretraining Task
@@ -34,9 +33,9 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 
 数据以行为单位存储。
 
-若想要替换成自己的数据集，可以使用自己的数据集进行替换。（注意：如果是预训练中文模型，需要修改配置文件Config.py中的self.initial_pretrain_model和self.initial_pretrain_tokenizer，将值修改成 bert-base-chinese）
+可以使用自己的数据集替换两个文件。（注意：如果是预训练中文模型，需要修改配置文件Config.py中的self.initial_pretrain_model和self.initial_pretrain_tokenizer，将值修改成 bert-base-chinese）
 
-自己的数据集不需要做mask机制处理，代码会处理。
+数据集不需要做mask机制处理，代码会处理。
 
 
 ## Training Target
@@ -68,7 +67,7 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 
 ## Get Start
 
-### 单卡模式
+### 单卡/CPU模式
 直接运行以下命令
 ```
     python train.py
@@ -80,7 +79,7 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 ```
 
 ### 多卡模式
-如果你不幸，拥有多张GPU卡，那么你可以进入起飞模式。🚀🚀
+如果你不幸，拥有多张GPU卡，那么现在开始你可以进入起飞模式。🚀🚀
 
 （1）修改Config.py文件中的变量self.cuda_visible_devices，指定你需要在哪几张卡上运行，卡号之间以英文逗号隔开。
 

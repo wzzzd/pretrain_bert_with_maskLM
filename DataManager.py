@@ -94,9 +94,13 @@ def op_mask(token, ids_mask, ids_ex, vocab):
             token = ids_mask
         if x> 0.80 and x <= 0.9:
             # 随机生成整数
-            token = random.randint(0, len(vocab)-1)
+            while True:
+                token = random.randint(0, len(vocab)-1)
+                # 不再特殊字符index里，则跳出
+                if token not in ids_ex:
+                    break
+            # token = random.randint(0, len(vocab)-1)
     return token
-
 
 
 def open_file(path):
