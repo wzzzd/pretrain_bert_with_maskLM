@@ -77,11 +77,13 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 如果你足够幸运，拥有了多张GPU卡，那么恭喜你，你可以进入起飞模式。🚀🚀
 
 （1）使用torch的nn.parallel.DistributedDataParallel模块进行多卡训练。其中config文件中参数如下，默认可以不用修改。
+<font color=#009393>
 * self.cuda_visible_devices表示程序可见的GPU卡号，示例：'1,2'→可在GPU卡号为1和2上跑，亦可以改多张，如'0,1,2,3'。
 * self.device在单卡模式，表示程序运行的卡号；在多卡模式下，表示master的主卡，默认会变成你指定卡号的第一张卡。若只有cpu，那么可修改为'cpu'。
 * self.port表示多卡模式下，进程通信占用的端口号。（无需修改）
 * self.init_method表示多卡模式下进程的通讯地址。（无需修改）
 * self.world_size表示启动的进程数量（无需修改）。在torch==1.3.0版本下，只需指定一个进程。在1.9.0以上，需要与GPU数量相同。
+</font>
 
 （2）运行程序启动命令
 ```
