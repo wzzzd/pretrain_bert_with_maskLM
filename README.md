@@ -3,9 +3,9 @@
 ## Info
 使用Mask LM预训练任务来预训练Bert模型。
 
-训练关于垂直领域语料的模型表征，提升下游任务的表现。
+基于pytorch框架，训练关于垂直领域语料的预训练语言模型，目的是提升下游任务的表现。
 
-基于pytorch。
+
 
 
 ## Pretraining Task
@@ -105,6 +105,6 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 
 【datasets】[https://huggingface.co/docs/datasets/quicktour.html](https://huggingface.co/docs/datasets/quicktour.html)
 
-【accelerate】[https://huggingface.co/docs/accelerate/quicktour.html](https://huggingface.co/docs/accelerate/quicktour.html)
+
 
 
