@@ -1,1 +1,1 @@
-accelerate launch train.py
+python -m torch.distributed.launch train.py

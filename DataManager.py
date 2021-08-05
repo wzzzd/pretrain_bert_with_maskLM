@@ -10,51 +10,51 @@ from tqdm.auto import tqdm
 from datasets import Dataset, load_dataset, load_metric
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, DataCollatorWithPadding, BertTokenizer
-# from Config import Config
+
+from torch.utils.data import DataLoader, TensorDataset, RandomSampler
+from torch.utils.data.distributed import DistributedSampler
 
 
 def get_dataset(config):
     """
     获取数据集
     """
+    # 读取tokenizer分词模型
+    tokenizer = AutoTokenizer.from_pretrained(config.initial_pretrain_tokenizer)        
+    train_dataloader = data_process('train.txt', tokenizer, config)
+    eval_dataloader = data_process('test.txt', tokenizer, config)
+    return train_dataloader, eval_dataloader
+
+
+
+def data_process(file_name, tokenizer, config):
+    """
+    数据转换
+    """
     # 获取数据
-    # raw_datasets = load_dataset("wikitext", "wikitext-2-v1")
-    # train_text = raw_datasets['train']['text']
-    # test_text = raw_datasets['test']['text']
-    train_text = open_file(config.path_datasets + 'train.txt')
-    test_text = open_file(config.path_datasets + 'test.txt')
-    
-    train_datasets = pd.DataFrame({'src':train_text, 'labels':train_text})
-    test_datasets = pd.DataFrame({'src':test_text, 'labels':test_text})
-    
-    raw_datasets_train = Dataset.from_pandas(train_datasets)
-    raw_datasets_test = Dataset.from_pandas(test_datasets)
-    
+    text = open_file(config.path_datasets + file_name)
+    dataset = pd.DataFrame({'src':text, 'labels':text})
+    # dataframe to datasets
+    raw_datasets = Dataset.from_pandas(dataset)
     # tokenizer.
-    # train set
-    tokenizer = AutoTokenizer.from_pretrained(config.initial_pretrain_tokenizer)        # 读取tokenizer分词模型
-    tokenized_datasets = raw_datasets_train.map(lambda x: tokenize_function(x, tokenizer, config), batched=True)        # 对于样本中每条数据进行数据转换
+    tokenized_datasets = raw_datasets.map(lambda x: tokenize_function(x, tokenizer, config), batched=True)        # 对于样本中每条数据进行数据转换
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)                        # 对数据进行padding
     tokenized_datasets = tokenized_datasets.remove_columns(["src"])                     # 移除不需要的字段
     tokenized_datasets.set_format("torch")                                              # 格式转换
-    
-    # test set
-    tokenized_datasets_test = raw_datasets_test.map(lambda x: tokenize_function(x, tokenizer, config), batched=True)
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    tokenized_datasets_test = tokenized_datasets_test.remove_columns(["src"])
-    tokenized_datasets_test.set_format("torch")
-    
     # 转换成DataLoader类
-    train_dataloader = DataLoader(tokenized_datasets, shuffle=True, batch_size=config.batch_size, collate_fn=data_collator)
-    eval_dataloader = DataLoader(tokenized_datasets_test, batch_size=config.batch_size, collate_fn=data_collator)
+    # train_dataloader = DataLoader(tokenized_datasets, shuffle=True, batch_size=config.batch_size, collate_fn=data_collator)
+    # eval_dataloader = DataLoader(tokenized_datasets_test, batch_size=config.batch_size, collate_fn=data_collator)
+    sampler = RandomSampler(tokenized_datasets) if not torch.cuda.device_count() > 1 else DistributedSampler(tokenized_datasets)
+    dataloader = DataLoader(tokenized_datasets, sampler=sampler, batch_size=config.batch_size, collate_fn=data_collator)
     
-    return train_dataloader, eval_dataloader
+    return dataloader
 
 
 def tokenize_function(example, tokenizer, config):
     """
     数据转换
     """
+    device = torch.device(config.device)
     # 分词
     token = tokenizer(example["src"], truncation=True, max_length=config.sen_max_length, padding=config.padding)
     token.data['labels'] = token.data['input_ids']
@@ -68,6 +68,8 @@ def tokenize_function(example, tokenizer, config):
     ids_ex = [tokenizer.convert_tokens_to_ids(x) for x in token_ex]
     # 获取vocab dict
     vocab = tokenizer.vocab
+    vocab_sort = sorted(vocab.items(), key=lambda x: x[1], reverse=False)
+    vocab_sort2 = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
     # mask机制
     mask_token = [[op_mask(x, ids_mask, ids_ex, vocab) for i,x in enumerate(line)] for line in token.data['input_ids']]
     # mask_token = [[ids_mask if len(line) > 5 and random.random()<=0.15 and i not in [0, len(line)-1] else x for i,x in enumerate(line)] for line in token.data['input_ids']]
@@ -101,6 +103,7 @@ def op_mask(token, ids_mask, ids_ex, vocab):
                     break
             # token = random.randint(0, len(vocab)-1)
     return token
+
 
 
 def open_file(path):

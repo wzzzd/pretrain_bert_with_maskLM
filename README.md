@@ -1,8 +1,11 @@
 # Pretrain_Bert_with_MaskLM
-使用Mask LM训练任务来预训练Bert模型。
 
-基于pytorch框架，训练关于垂直领域语料的模型表征，提升下游任务的表现。
+## Info
+使用Mask LM预训练任务来预训练Bert模型。
 
+训练关于垂直领域语料的模型表征，提升下游任务的表现。
+
+基于pytorch。
 
 
 ## Pretraining Task
@@ -13,29 +16,22 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
     * 80%的概率，使用字符'[MASK]'，替换当前token。
     * 10%的概率，使用词表随机抽取的token，替换当前token。
     * 10%的概率，保留原词不变。
-* paper
-<!-- * ![](./picture/mask_method.png) -->
-
-<div align="center">
- <img src=./picture/mask_method.png width=50% />
-</div>
-
+    <!-- * ![](./picture/mask_method.png) -->
+    * <img src=./picture/mask_method.png width=60% />
 
 ## Model
-使用原生的Bert模型作为基准模型。（原始的bert是使用MaskLM+NSP训练的，但是多篇论文证明了NSP对Bert的语义理解能力提升不大，此处去除该任务）
-<!-- * ![](./picture/bert_architecture.png) -->
-<div align="center">
- <img src=./picture/bert_architecture.png width=50% />
-</div>
+使用原生的Bert模型作为基准模型。
+* ![](./picture/bert_architecture.png)
+
 
 ## Datasets
 项目里的数据集来自wikitext，分成两个文件训练集（train.txt）和测试集（test.txt）。
 
 数据以行为单位存储。
 
-可以使用自己的数据集替换两个文件。（注意：如果是预训练中文模型，需要修改配置文件Config.py中的self.initial_pretrain_model和self.initial_pretrain_tokenizer，将值修改成 bert-base-chinese）
+若想要替换成自己的数据集，可以使用自己的数据集进行替换。（注意：如果是预训练中文模型，需要修改配置文件Config.py中的self.initial_pretrain_model和self.initial_pretrain_tokenizer，将值修改成 bert-base-chinese）
 
-数据集不需要做mask机制处理，代码会处理。
+自己的数据集不需要做mask机制处理，代码会处理。
 
 
 ## Training Target
@@ -54,20 +50,19 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 主要包含的模块如下：
 ```
     python3.6
-    torch==1.9.0
+    torch==1.3.0
     tqdm==4.61.2
-    transformers==4.9.1
+    transformers==4.6.1
     datasets==1.10.2
-    accelerate==0.3.0
     numpy==1.19.5
-    pandas==1.1.5
+    pandas==1.1.3
 ```
 
 
 
 ## Get Start
 
-### 单卡/CPU模式
+### 单卡模式
 直接运行以下命令
 ```
     python train.py
@@ -79,31 +74,16 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 ```
 
 ### 多卡模式
-如果你不幸，拥有多张GPU卡，那么现在开始你可以进入起飞模式。🚀🚀
+如果你足够幸运，拥有了多张GPU卡，那么恭喜你，你可以进入起飞模式。🚀🚀
 
-（1）修改Config.py文件中的变量self.cuda_visible_devices，指定你需要在哪几张卡上运行，卡号之间以英文逗号隔开。
+（1）使用torch的nn.parallel.DistributedDataParallel模块进行多卡训练。其中config文件中参数如下，默认可以不用修改。
+* self.cuda_visible_devices表示程序可见的GPU卡号，示例：'1,2'→可在GPU卡号为1和2上跑，亦可以改多张，如'0,1,2,3'。
+* self.device在单卡模式，表示程序运行的卡号；在多卡模式下，表示master的主卡，默认会变成你指定卡号的第一张卡。若只有cpu，那么可修改为'cpu'。
+* self.port表示多卡模式下，进程通信占用的端口号。（无需修改）
+* self.init_method表示多卡模式下进程的通讯地址。（无需修改）
+* self.world_size表示启动的进程数量（无需修改）。在torch==1.3.0版本下，只需指定一个进程。在1.9.0以上，需要与GPU数量相同。
 
-（2）因为使用的是accelerate加速模块，需要配置一些环境信息，在确保安装完环境所以的依赖包后，运行命令：
-```
-    accelerate config
-```
-（3）后面在终端会弹出以下问题让你回答，需要回复对应的数字来配置信息，以下是示例：
-* In which compute environment are you running? ([0] This machine, [1] AWS (Amazon SageMaker)):
-    * 回复0+回车：在本机运行
-* Which type of machine are you using? ([0] No distributed training, [1] multi-GPU, [2] TPU):
-    * 回复1+回车：使用多卡训练模式
-* How many different machines will you use (use more than 1 for multi-node training)? [1]: 
-    * 回复1+回车：使用多于一张卡
-* How many processes in total will you use? [1]: 
-    * 回复1+回车：启动两个进程运行
-* Do you wish to use FP16 (mixed precision)? [yes/NO]:
-    * 回复NO+回车：不使用FP16单精度加速
-<!-- * ![](./picture/accelerate_config.png) -->
-<div align="center">
- <img src=./picture/accelerate_config.png />
-</div>
-
-（4）运行程序启动命令
+（2）运行程序启动命令
 ```
     chmod 755 run.sh
     ./run.sh
