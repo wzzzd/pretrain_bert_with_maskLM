@@ -10,9 +10,10 @@
 
 ## Pretraining Task
 Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模型。
+
 同时支持 原生的`MaskLM`任务和`Whole Words Masking`任务。默认使用`Whole Words Masking`。
 
-### MaskLM
+#### MaskLM
 使用来自于Bert的mask机制，即对于每一个句子中的词（token）：
 * 85%的概率，保留原词不变
 * 15%的概率，使用以下方式替换
@@ -21,9 +22,12 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
     * 10%的概率，保留原词不变。
     <!-- * ![](./picture/mask_method.png) -->
     * <img src=./picture/mask_method.png width=50% />
-### Whole Words Masking
+
+#### Whole Words Masking
 与MaskLM类似，但是在mask的步骤有些少不同。
+
 在Bert类模型中，考虑到如果单独使用整个词作为词表的话，那词表就太大了。不利于模型对同类词的不同变种的特征学习，故采用了WordPiece的方式进行分词。
+
 `Whole Words Masking`的方法在于，在进行mask操作时，对象变为分词前的整个词，而非子词。
 
 

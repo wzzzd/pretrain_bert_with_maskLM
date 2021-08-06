@@ -30,7 +30,7 @@ def train(config):
     device = torch.device(config.device)
 
     # 多卡通讯配置
-    if config.mode == 'train' and torch.cuda.device_count() > 1:
+    if torch.cuda.device_count() > 1:
         torch.distributed.init_process_group(backend='nccl', 
                                              init_method=config.init_method, 
                                              rank=0, 
