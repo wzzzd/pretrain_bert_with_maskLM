@@ -54,7 +54,6 @@ def tokenize_function(example, tokenizer, config):
     """
     数据转换
     """
-    device = torch.device(config.device)
     # 分词
     token = tokenizer(example["src"], truncation=True, max_length=config.sen_max_length, padding=config.padding)
     token.data['labels'] = token.data['input_ids']
@@ -68,13 +67,86 @@ def tokenize_function(example, tokenizer, config):
     ids_ex = [tokenizer.convert_tokens_to_ids(x) for x in token_ex]
     # 获取vocab dict
     vocab = tokenizer.vocab
-    vocab_sort = sorted(vocab.items(), key=lambda x: x[1], reverse=False)
-    vocab_sort2 = sorted(vocab.items(), key=lambda x: x[1], reverse=True)
+    vocab_int2str = { v:k for k, v in vocab.items()}
     # mask机制
-    mask_token = [[op_mask(x, ids_mask, ids_ex, vocab) for i,x in enumerate(line)] for line in token.data['input_ids']]
-    # mask_token = [[ids_mask if len(line) > 5 and random.random()<=0.15 and i not in [0, len(line)-1] else x for i,x in enumerate(line)] for line in token.data['input_ids']]
+    if config.whole_words_mask:
+        # whole words masking
+        mask_token = [ op_mask_wwm(line, ids_mask, ids_ex, vocab_int2str) for line in token.data['input_ids']]
+    else:
+        mask_token = [[op_mask(x, ids_mask, ids_ex, vocab) for i,x in enumerate(line)] for line in token.data['input_ids']]
     token.data['input_ids'] = mask_token
     return token
+
+
+
+def op_mask_wwm(tokens, ids_mask, ids_ex, vocab_int2str):
+    """
+    基于全词mask
+    """
+    if len(tokens) <= 5:
+        return tokens
+    # string = [tokenizer.convert_ids_to_tokens(x) for x in tokens]
+    line = tokens
+    for i, token in enumerate(tokens):
+        # 若在额外字符里，则跳过
+        if token in ids_ex:
+            line[i] = token
+            continue
+        # 采样替换
+        if random.random()<=0.15:
+            x = random.random()
+            if x <= 0.80:
+                # 获取词string
+                token_str = vocab_int2str[token]
+                # 若含有子词标志
+                if '##' in token_str:
+                    line[i] = ids_mask
+                    # 前向寻找
+                    curr_i = i - 1
+                    flag = True
+                    while flag:
+                        # 判断当前词是否包含 ##
+                        token_index = tokens[curr_i]
+                        token_index_str = vocab_int2str[token_index]
+                        if '##' not in token_index_str:
+                            flag = False
+                        line[curr_i] = ids_mask
+                        curr_i -= 1
+                    # 后向寻找
+                    curr_i = i + 1
+                    flag = True
+                    while flag:
+                        # 判断当前词是否包含 ##
+                        token_index = tokens[curr_i]
+                        token_index_str = vocab_int2str[token_index]
+                        if '##' not in token_index_str:
+                            flag = False
+                        else:
+                            line[curr_i] = ids_mask
+                        curr_i += 1
+                else:
+                    # 若不含有子词标志
+                    line[i] = ids_mask
+                    # 后向寻找
+                    curr_i = i + 1
+                    flag = True
+                    while flag:
+                        # 判断当前词是否包含 ##
+                        token_index = tokens[curr_i]
+                        token_index_str = vocab_int2str[token_index]
+                        if '##' not in token_index_str:
+                            flag = False
+                        else:
+                            line[curr_i] = ids_mask
+                        curr_i += 1
+            if x> 0.80 and x <= 0.9:
+                # 随机生成整数
+                while True:
+                    token = random.randint(0, len(vocab_int2str)-1)
+                    # 不再特殊字符index里，则跳出
+                    if token not in ids_ex:
+                        break
+    return line
 
 
 def op_mask(token, ids_mask, ids_ex, vocab):
