@@ -20,7 +20,7 @@ def get_dataset(config):
     获取数据集
     """
     # 读取tokenizer分词模型
-    tokenizer = AutoTokenizer.from_pretrained(config.initial_pretrain_tokenizer)        
+    tokenizer = AutoTokenizer.from_pretrained(config.initial_pretrain_tokenizer)     
     train_dataloader = data_process('train.txt', tokenizer, config)
     eval_dataloader = data_process('test.txt', tokenizer, config)
     return train_dataloader, eval_dataloader
@@ -98,33 +98,7 @@ def op_mask_wwm(tokens, ids_mask, ids_ex, vocab_int2str):
             if x <= 0.80:
                 # 获取词string
                 token_str = vocab_int2str[token]
-                # 若含有子词标志
-                if '##' in token_str:
-                    line[i] = ids_mask
-                    # 前向寻找
-                    curr_i = i - 1
-                    flag = True
-                    while flag:
-                        # 判断当前词是否包含 ##
-                        token_index = tokens[curr_i]
-                        token_index_str = vocab_int2str[token_index]
-                        if '##' not in token_index_str:
-                            flag = False
-                        line[curr_i] = ids_mask
-                        curr_i -= 1
-                    # 后向寻找
-                    curr_i = i + 1
-                    flag = True
-                    while flag:
-                        # 判断当前词是否包含 ##
-                        token_index = tokens[curr_i]
-                        token_index_str = vocab_int2str[token_index]
-                        if '##' not in token_index_str:
-                            flag = False
-                        else:
-                            line[curr_i] = ids_mask
-                        curr_i += 1
-                else:
+                if '##' not in token_str:
                     # 若不含有子词标志
                     line[i] = ids_mask
                     # 后向寻找
@@ -188,3 +162,74 @@ def open_file(path):
     return text
 
 
+
+
+
+# def op_mask_wwm(tokens, ids_mask, ids_ex, vocab_int2str):
+#     """
+#     基于全词mask
+#     """
+#     if len(tokens) <= 5:
+#         return tokens
+#     # string = [tokenizer.convert_ids_to_tokens(x) for x in tokens]
+#     line = tokens
+#     for i, token in enumerate(tokens):
+#         # 若在额外字符里，则跳过
+#         if token in ids_ex:
+#             line[i] = token
+#             continue
+#         # 采样替换
+#         if random.random()<=0.15:
+#             x = random.random()
+#             if x <= 0.80:
+#                 # 获取词string
+#                 token_str = vocab_int2str[token]
+#                 # 若含有子词标志
+#                 if '##' in token_str:
+#                     line[i] = ids_mask
+#                     # 前向寻找
+#                     curr_i = i - 1
+#                     flag = True
+#                     while flag:
+#                         # 判断当前词是否包含 ##
+#                         token_index = tokens[curr_i]
+#                         token_index_str = vocab_int2str[token_index]
+#                         if '##' not in token_index_str:
+#                             flag = False
+#                         line[curr_i] = ids_mask
+#                         curr_i -= 1
+#                     # 后向寻找
+#                     curr_i = i + 1
+#                     flag = True
+#                     while flag:
+#                         # 判断当前词是否包含 ##
+#                         token_index = tokens[curr_i]
+#                         token_index_str = vocab_int2str[token_index]
+#                         if '##' not in token_index_str:
+#                             flag = False
+#                         else:
+#                             line[curr_i] = ids_mask
+#                         curr_i += 1
+#                 else:
+#                     # 若不含有子词标志
+#                     line[i] = ids_mask
+#                     # 后向寻找
+#                     curr_i = i + 1
+#                     flag = True
+#                     while flag:
+#                         # 判断当前词是否包含 ##
+#                         token_index = tokens[curr_i]
+#                         token_index_str = vocab_int2str[token_index]
+#                         if '##' not in token_index_str:
+#                             flag = False
+#                         else:
+#                             line[curr_i] = ids_mask
+#                         curr_i += 1
+#             if x> 0.80 and x <= 0.9:
+#                 # 随机生成整数
+#                 while True:
+#                     token = random.randint(0, len(vocab_int2str)-1)
+#                     # 不再特殊字符index里，则跳出
+#                     if token not in ids_ex:
+#                         break
+#     return line
