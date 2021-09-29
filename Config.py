@@ -18,7 +18,7 @@ class Config(object):
         
         # 训练配置
         self.whole_words_mask = True                                # 使用是否whole words masking机制
-        self.num_epochs = 100                                        # 迭代次数
+        self.num_epochs = 100                                       # 迭代次数
         self.batch_size = 128                                       # 每个批次的大小
         self.learning_rate = 3e-4                                   # 学习率
         self.num_warmup_steps = 0.1                                 # warm up步数
@@ -29,6 +29,6 @@ class Config(object):
         self.initial_pretrain_model = 'bert-base-uncased'           # 加载的预训练分词器checkpoint，默认为英文。若要选择中文，替换成 bert-base-chinese
         self.initial_pretrain_tokenizer = 'bert-base-uncased'       # 加载的预训练模型checkpoint，默认为英文。若要选择中文，替换成 bert-base-chinese
         self.path_model_save = './checkpoint/'                      # 模型保存路径
-        self.path_datasets = './datasets/shopline-all/'             # 数据集
+        self.path_datasets = './datasets/'                          # 数据集
         self.path_log = './logs/'
         
