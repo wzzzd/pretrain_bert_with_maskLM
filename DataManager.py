@@ -56,7 +56,7 @@ def tokenize_function(example, tokenizer, config):
     数据转换
     """
     # 分词
-    token = tokenizer(example["src"], truncation=True, max_length=config.sen_max_length, padding=config.padding)
+    token = tokenizer(example["src"], truncation=True, max_length=config.sen_max_length, padding='max_length')
     label=copy.deepcopy(token.data['input_ids'])
     token.data['labels'] = label
     #token.data['labels'] = token.data['input_ids']

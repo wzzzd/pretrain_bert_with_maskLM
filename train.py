@@ -80,25 +80,27 @@ def train(config):
             if i % 500 == 0:
                 print('epoch:{0}  iter:{1}/{2}  loss:{3}'.format(epoch, i, len(train_dl), loss.item()))
         # 模型保存
-        current_loss = eval(eval_dl, model, epoch)
+        current_loss = eval(eval_dl, model, epoch, device)
         # current_loss = loss.item()
         if current_loss < loss_best:
             loss_best = current_loss
             print('saving model')
-            path = config.path_model_save + '/epoch_{}/'.format(epoch)
+            path = config.path_model_save + 'epoch_{}/'.format(epoch)
             if not os.path.exists(path):
-                os.mkdir(path)
+                os.makedirs(path)
             model_save = model.module if torch.cuda.device_count() > 1 else model
             model_save.save_pretrained(path)
 
 
-def eval(eval_dataloader, model, epoch):
+def eval(eval_dataloader, model, epoch, device):
     losses = []
     model.eval()
     for batch in eval_dataloader:
+        batch.data = {k:v.to(device) for k,v in batch.data.items()}
         with torch.no_grad():
             outputs = model(**batch)
         loss = outputs.loss
+        loss = loss.unsqueeze(0)
         losses.append(loss)
     # 计算困惑度
     losses = torch.cat(losses)
