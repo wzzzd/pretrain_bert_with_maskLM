@@ -55,6 +55,7 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 
 项目主要使用了Huggingface的`datasets`、`transformers`模块，支持CPU、单卡单机、单机多卡三种模式。
 
+python的版本为: 3.8
 
 可通过以下命令安装依赖包
 ```
@@ -62,13 +63,12 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 ```
 主要包含的模块如下：
 ```
-    python3.6
-    torch==1.3.0
-    tqdm==4.61.2
-    transformers==4.6.1
-    datasets==1.10.2
-    numpy==1.19.5
-    pandas==1.1.3
+    numpy==1.24.1
+    pandas==1.5.2
+    scikit_learn==1.2.1
+    torch==1.8.0
+    tqdm==4.64.1
+    transformers==4.26.1
 ```
 
 
@@ -100,10 +100,12 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 ```
 
 # Experiment
+## training
 使用交叉熵（cross-entropy）作为损失函数，困惑度（perplexity）和Loss作为评价指标来进行训练，训练过程如下：
 <!-- ![](./picture/experiment.png) -->
 <img src=./picture/experiment.png width=70% />
 
+## prediction
 
 
 
