@@ -100,12 +100,13 @@ python的版本为: 3.8
 ```
 
 # Experiment
+
 ## training
 使用交叉熵（cross-entropy）作为损失函数，困惑度（perplexity）和Loss作为评价指标来进行训练，训练过程如下：
 <!-- ![](./picture/experiment.png) -->
 <img src=./picture/experiment.png width=70% />
 
-## prediction
+
 
 
 
