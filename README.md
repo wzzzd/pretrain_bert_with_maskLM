@@ -80,11 +80,6 @@ Mask Language Model，简称Mask LM，即基于Mask机制的预训练语言模�
 ```
     python train.py
 ```
-或修改Config.py文件中的变量`self.cuda_visible_devices`为单卡后，运行
-```
-    chmod 755 run.sh
-    ./run.sh
-```
 
 ### 多卡模式
 如果你足够幸运，拥有了多张GPU卡，那么恭喜你，你可以进入起飞模式。🚀🚀
