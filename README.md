@@ -76,12 +76,21 @@ python的版本为: 3.8
 ## Get Start
 
 ### 单卡模式
-直接运行以下命令
+(1) 训练
+
+直接运行
 ```
-    python train.py
+    python main.py
 ```
 
-### 多卡模式
+(2) 测试
+
+修改`Config.py`文件中的`self.mode='test'`，再运行
+```
+    python main.py
+```
+
+### 多卡模式（训练）
 如果你足够幸运，拥有了多张GPU卡，那么恭喜你，你可以进入起飞模式。🚀🚀
 
 （1）使用torch的`nn.parallel.DistributedDataParallel`模块进行多卡训练。其中`config.py`文件中参数如下，默认可以不用修改。
@@ -106,8 +115,19 @@ python的版本为: 3.8
 <!-- ![](./picture/experiment.png) -->
 <img src=./picture/experiment.png width=70% />
 
+## test
+结果保存在`dataset/output/pred_data.csv`，分别包含三列：
+- `src`表示原始输入
+- `pred`表示模型预测
+- `mask`表示模型输入（带有mask和pad等token）
 
+示例
 
+```
+src:  [CLS] art education and first professional work [SEP]
+pred: [CLS] art education and first class work [SEP]
+mask: [CLS] art education and first [MASK] work [SEP] [PAD] [PAD] [PAD] ...
+```
 
 
 # Reference
